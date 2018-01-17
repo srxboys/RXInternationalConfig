@@ -122,6 +122,9 @@ bool isDict(id objc) {
             }
         });
     }
+    else {
+        if(complete) complete(nil);
+    }
 
 
     
@@ -137,7 +140,7 @@ bool isDict(id objc) {
             });
         }
         else {
-            // Fallback on earlier versions
+            if(complete) complete(nil);
         }
 }
 

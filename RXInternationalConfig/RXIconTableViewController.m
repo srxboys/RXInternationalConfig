@@ -35,7 +35,7 @@ static NSString * const CELL_ID_1 = @"cell_1";
     [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:CELL_ID_1];
     self.tableView.tableFooterView = [UIView new];
     self.tableView.rowHeight = 50;
-    self.tableView.sectionHeaderHeight = 30;
+    self.tableView.sectionHeaderHeight = 70;
 
     NOTI_ADD_OBNAME(@selector(refresh), @"update_icon");
 }
@@ -56,8 +56,10 @@ static NSString * const CELL_ID_1 = @"cell_1";
 }
 
 - (void)refresh {
-    self.loc_icon = nil;
-    [self.tableView reloadData];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        self.loc_icon = nil;
+        [self.tableView reloadData];
+    });
 }
 
 #pragma mark - Table view data source
@@ -112,12 +114,13 @@ static NSString * const CELL_ID_1 = @"cell_1";
             [tableView deselectRowAtIndexPath:indexPath animated:YES];
             STATUS_BAR_STOP();
             self.view.userInteractionEnabled = YES;
-            
+            [self refresh];
             if(error) {
                 //NSLog(@"还原设置失败 error=%@", error.description);
             }
             else {
                 NSLog(@"还原设置成功");
+                UserSaveSetting(@"icon_name_srx", @"");
             }
         }];
     }
@@ -128,11 +131,13 @@ static NSString * const CELL_ID_1 = @"cell_1";
             [tableView deselectRowAtIndexPath:indexPath animated:YES];
             STATUS_BAR_STOP();
             self.view.userInteractionEnabled = YES;
+            [self refresh];
             if(error) {
     //            NSLog(@"设置失败 error=%@", error.description);
             }
             else {
                 NSLog(@"设置成功");
+                UserSaveSetting(@"icon_name_srx", iconName);
             }
         }];
     }
@@ -184,5 +189,9 @@ static NSString * const CELL_ID_1 = @"cell_1";
     // Pass the selected object to the new view controller.
 }
 */
+
+- (void)dealloc {
+    NOTI_REMOVE_SELF;
+}
 
 @end
