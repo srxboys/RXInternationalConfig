@@ -94,7 +94,7 @@ if(resultArray.count > 0)  { \
 
 // 沙盒存取
 #define UserSaveSetting(key, value)\
-NSUserDefaults *def =[NSUserDefaults standardUserDefaults];\
+NSUserDefaults *def = [NSUserDefaults standardUserDefaults];\
 [def setObject:value forKey:key];\
 [def synchronize];
 
