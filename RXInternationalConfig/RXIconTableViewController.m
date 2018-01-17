@@ -15,6 +15,7 @@ static NSString * const CELL_ID_1 = @"cell_1";
 @interface RXIconTableViewController ()
 @property (nonatomic, copy) NSArray * primaryArray;
 @property (nonatomic, copy) NSArray * newsstandArray;
+@property (nonatomic, copy) NSString * loc_icon;
 @end
 
 @implementation RXIconTableViewController
@@ -35,11 +36,28 @@ static NSString * const CELL_ID_1 = @"cell_1";
     self.tableView.tableFooterView = [UIView new];
     self.tableView.rowHeight = 50;
     self.tableView.sectionHeaderHeight = 30;
+
+    NOTI_ADD_OBNAME(@selector(refresh), @"update_icon");
 }
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+- (NSString *)loc_icon {
+    if(!_loc_icon) {
+        _loc_icon = UserGetSetting(@"icon_name_srx");
+        if(_loc_icon.length == 0) {
+            _loc_icon = @"icon_0";
+        }
+    }
+    return _loc_icon;
+}
+
+- (void)refresh {
+    self.loc_icon = nil;
+    [self.tableView reloadData];
 }
 
 #pragma mark - Table view data source
@@ -73,6 +91,9 @@ static NSString * const CELL_ID_1 = @"cell_1";
     UIImage * img = [UIImage imageNamed:title];
     cell.imageView.image = img;
     cell.textLabel.text = title;
+    if([title isEqualToString:self.loc_icon]) {
+        cell.accessoryType = UITableViewCellAccessoryCheckmark;
+    }
     return cell;
 }
 
@@ -87,7 +108,6 @@ static NSString * const CELL_ID_1 = @"cell_1";
     NSString * iconName = nil;
     NSInteger row = indexPath.row;
     if(indexPath.section == 0) {
-        UserSaveSetting(@"icon_name", iconName);
         [RXChangeIcon restoreIconImgComplete:^(NSError * _Nullable error) {
             [tableView deselectRowAtIndexPath:indexPath animated:YES];
             STATUS_BAR_STOP();
@@ -103,7 +123,6 @@ static NSString * const CELL_ID_1 = @"cell_1";
     }
     else {
         iconName = row < self.newsstandArray.count ? self.newsstandArray[row] : @"";
-        UserSaveSetting(@"icon_name", iconName);
         NSLog(@"\n\niconName=%@\n\n", iconName);
         [RXChangeIcon setIcon:iconName complete:^(NSError * _Nullable error) {
             [tableView deselectRowAtIndexPath:indexPath animated:YES];

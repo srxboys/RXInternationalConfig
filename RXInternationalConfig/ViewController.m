@@ -20,6 +20,7 @@
 >
 @property (nonatomic, copy) NSMutableArray * sourceArray;
 @property (nonatomic, copy) UITableView * tableView;
+@property (nonatomic, strong, nullable) dispatch_group_t group;
 @end
 
 @implementation ViewController
@@ -53,6 +54,7 @@
 
 - (void)configUI {
     _sourceArray = [NSMutableArray new];
+    self.group = dispatch_group_create();
     
     //built settings
     //编译模式 == 可以直接全局使用
@@ -89,6 +91,12 @@
 
 - (void)getSettingBundle {
     
+    // 设置一个异步线程组
+    dispatch_group_async(self.group, dispatch_queue_create("com.dispatch.test", DISPATCH_QUEUE_CONCURRENT), ^{
+    
+    // 创建一个信号量为0的信号(红灯)
+    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+    
     NSArray * prefSpecifierArray = nil;
     SETTING_BUNDLE(prefSpecifierArray);
  
@@ -111,13 +119,24 @@
         
 //下面的判断 只是为了看效果，不建议项目中使用
 if([keyValueStr isEqualToString:@"Title_preference"]) {
-    if(![UserGetSetting(@"icon_name") isEqualToString:defaultValue]) {
-        UserSaveSetting(@"icon_name", defaultValue);
+    NSString * loc_icon = UserGetSetting(@"icon_name_srx");
+    if(![loc_icon isEqualToString:defaultValue]) {
+        UserSaveSetting(@"icon_name_srx", defaultValue);
         if(((NSString *)defaultValue).length > 0) {
-            [RXChangeIcon setIcon:defaultValue complete:nil];
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                [RXChangeIcon setIcon:defaultValue complete:^(NSError * _Nullable error) {
+                    // 使信号的信号量+1，这里的信号量本来为0，+1信号量为1(绿灯)
+                    dispatch_semaphore_signal(sema);
+                    NOTI_POST(@"update_icon");
+                }];
+            });
         }
         else {
-            [RXChangeIcon restoreIconImgComplete:nil];
+            [RXChangeIcon restoreIconImgComplete:^(NSError * _Nullable error) {
+                // 使信号的信号量+1，这里的信号量本来为0，+1信号量为1(绿灯)
+                dispatch_semaphore_signal(sema);
+                NOTI_POST(@"update_icon");
+            }];
         }
     }
 }
@@ -133,10 +152,16 @@ if([keyValueStr isEqualToString:@"Title_preference"]) {
         [_sourceArray addObject:@{keyValueStr : defaultValue}];
     }
 
-    if(_sourceArray.count > 0) {
-        [self.tableView reloadData];
-    }
+    // 开启信号等待，设置等待时间为永久，直到信号的信号量大于等于1（绿灯）
+    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if(_sourceArray.count > 0) {
+            [self.tableView reloadData];
+        }
+    });
+});
 }
+                         
 
 - (UITableView *)tableView {
     if(!_tableView) {
