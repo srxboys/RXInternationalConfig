@@ -1,0 +1,15 @@
+/* 
+  InfoPlist.strings
+  RXInternationalConfig
+
+  Created by srxboys on 2018/1/16.
+  Copyright © 2018年 srxboys. All rights reserved.
+*/
+/*
+     中国（简体）
+     
+     infoPlist.plist 国际化(也可以在 plist里做，由于我可能只改几个，我就写string语言包了)
+ */
+
+//app 名称
+CFBundleDisplayName = "孙 图标";

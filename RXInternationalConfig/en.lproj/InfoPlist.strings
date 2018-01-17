@@ -1,0 +1,26 @@
+/* 
+  InfoPlist.strings
+  RXInternationalConfig
+
+  Created by srxboys on 2018/1/16.
+  Copyright © 2018年 srxboys. All rights reserved.
+*/
+/*
+     美国（英语）
+     
+     infoPlist.plist 国际化(也可以在 plist里做，由于我可能只改几个，我就写string语言包了)
+ 
+ 
+ 
+ 键值对  写法
+ info.plist ->  右键->   Source Code
+ 
+ 就看到了
+ 
+ ------------
+ 或者
+ https://developer.apple.com/library/content/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html#//apple_ref/doc/uid/TP40009249-SW9
+ */
+
+//app 名称
+CFBundleDisplayName = "s ion";

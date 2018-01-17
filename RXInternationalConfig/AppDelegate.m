@@ -17,9 +17,21 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+    [self languageLocalizable];
     return YES;
 }
 
+-(void)languageLocalizable{
+    //第一次启动把语言存本地
+
+    NSString *language = CurrentLanguage;
+    if ([language hasPrefix:CONST_LANGUAGE_ZN]) {//开头匹配
+        UserSaveSetting(Sandbox_APP_LANGUAGE, CONST_LANGUAGE_ZN);
+    }else{
+        UserSaveSetting(Sandbox_APP_LANGUAGE, CONST_LANGUAGE_EN);
+    }
+    //    }
+}
 
 - (void)applicationWillResignActive:(UIApplication *)application {
     // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.

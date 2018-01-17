@@ -1,0 +1,168 @@
+//
+//  PrefixHeader.pch
+//  RXInternationalConfig
+//
+//  Created by srxboys on 2018/1/16.
+//  Copyright © 2018年 srxboys. All rights reserved.
+//
+
+#ifndef PrefixHeader_pch
+#define PrefixHeader_pch
+
+// Include any system framework and library headers here that should be included in all compilation units.
+// You will also need to set the Prefix Header build setting of one or more of your targets to reference this file.
+
+//built settings
+//编译模式 == 可以直接全局使用
+//Distribution : app是否是生产包
+//Interface_Distribution=1  : 接口是否是生产接口
+//DEBUG
+
+#define NAV_VIEW_ADD_BAR_BUTTON(__target, __title, __action, __isLeft) \
+do { \
+    UIButton * btn = [UIButton buttonWithType:UIButtonTypeCustom]; \
+    [btn setTitle:__title forState:UIControlStateNormal]; \
+    [btn setTitleColor:[UIColor grayColor] forState:UIControlStateNormal];\
+    btn.frame = CGRectMake(0, 0, 80, 70);\
+    [btn addTarget:__target action:__action forControlEvents:UIControlEventTouchUpInside]; \
+    UIBarButtonItem * item = [[UIBarButtonItem alloc] initWithCustomView:btn]; \
+    if(__isLeft) { \
+        __target.navigationItem.leftBarButtonItem = item; \
+    } \
+    else { \
+        __target.navigationItem.rightBarButtonItem = item; \
+    } \
+} while (0)
+
+
+
+#define SETTING_BUNDLE(__array) \
+do { \
+    NSString * kSettingKey = @"srxboys_root_plist"; \
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];\
+    if ([defaults dataForKey:kSettingKey] == nil) { \
+        NSString *pathStr = [[NSBundle mainBundle] bundlePath];\
+        NSString *settingsBundlePath = [pathStr stringByAppendingPathComponent:@"Settings.bundle"];\
+        NSString *finalPath = [settingsBundlePath stringByAppendingPathComponent:@"Root.plist"];\
+        NSDictionary *settingsDict = [NSDictionary dictionaryWithContentsOfFile:finalPath];\
+        __array = settingsDict[@"PreferenceSpecifiers"];\
+        if (__array.count > 0) { \
+            NSDictionary *appDefaults = @{kSettingKey: __array}; \
+            [defaults registerDefaults:appDefaults];\
+            [defaults synchronize];\
+        }\
+    } \
+\
+NSMutableArray * resultArray = [NSMutableArray new]; \
+[resultArray addObjectsFromArray:[defaults arrayForKey:kSettingKey]]; \
+if(resultArray.count > 0)  { \
+    for (NSInteger i = 0; i < resultArray.count; i++) { \
+    NSDictionary * dict = resultArray[i]; \
+    NSString * keyStr = @"Key"; \
+    if([dict.allKeys containsObject:keyStr]) { \
+        NSString * defaultsKey = [dict objectForKey:keyStr]; \
+        id value = [defaults objectForKey:defaultsKey]; \
+        NSString * key = @"DefaultValue"; \
+        if(value == nil) { \
+            value = [dict objectForKey:key]; \
+        } \
+\
+        if(value == nil) { \
+            value = @""; \
+        } \
+\
+        NSMutableDictionary * newDict = [NSMutableDictionary dictionaryWithDictionary:dict]; \
+        [newDict setObject:value forKey:key]; \
+        [resultArray replaceObjectAtIndex:i withObject:newDict]; \
+    } \
+    } \
+    } \
+    __array = resultArray; \
+} while (0)
+
+
+
+//------------------------------------------------
+//------------------------------------------------
+//------------------------------------------------
+//------------------------------------------------
+
+#import "Localized.h"
+
+
+
+
+// 沙盒存取
+#define UserSaveSetting(key, value)\
+NSUserDefaults *def =[NSUserDefaults standardUserDefaults];\
+[def setObject:value forKey:key];\
+[def synchronize];
+
+#define UserGetSetting(key)   [[NSUserDefaults standardUserDefaults] objectForKey:key]
+
+#define UserRemoveSetting(key) \
+NSUserDefaults *def =[NSUserDefaults standardUserDefaults];\
+[def removeObjectForKey:key];\
+[def synchronize];
+
+/********************** 通用常量 *************************/
+#define CONST_LANGUAGE_ZN            @"zh-Hans"
+#define CONST_LANGUAGE_EN            @"en"
+
+/********************** 沙盒 ******************************/
+#pragma mark  -- 沙盒 --
+#define Sandbox_APP_LANGUAGE        @"Sandbox_app_language"
+
+//获取当前语言
+#define CurrentLanguage ([[NSLocale preferredLanguages] objectAtIndex:0])
+
+///多语言 根据当前语言环境取到对应字符
+#define Localized(key)  [[NSBundle bundleWithPath:[[NSBundle mainBundle] pathForResource:[NSString stringWithFormat:@"%@",[[NSUserDefaults standardUserDefaults] objectForKey:@"Sandbox_app_language"]] ofType:@"lproj"]] localizedStringForKey:(key) value:nil table:@"Language"]
+
+#define LocSource(key)  [[NSBundle bundleWithPath:[[NSBundle mainBundle] pathForResource:[NSString stringWithFormat:@"%@",[[NSUserDefaults standardUserDefaults] objectForKey:@"Sandbox_app_language"]] ofType:@"lproj"]] localizedStringForKey:(key) value:nil table:@"Source"]
+
+
+
+//------------------------------------------------
+//------------------------------------------------
+//------------------------------------------------
+//------------------------------------------------
+
+
+
+/*
+ * ------ 状态栏 旋转小菊花 ----
+ */
+#define STATUS_BAR_START() [UIApplication sharedApplication].networkActivityIndicatorVisible = YES
+#define STATUS_BAR_STOP() [UIApplication sharedApplication].networkActivityIndicatorVisible = NO
+
+
+
+
+
+#pragma mark ---- notifacation 通知定义 --------
+/**
+ ----------------------【通知 定义】------------------------------------------
+ *
+ * 全局通知 (不包含 kvc kvo)
+ */
+#define NOTI_ADD_OBNAME(eumMethod,obserName)    [[NSNotificationCenter defaultCenter] addObserver:self selector:eumMethod name:obserName object:nil]
+
+#define NOTI_POST(obserName) [[NSNotificationCenter defaultCenter] postNotificationName:obserName object:nil userInfo:nil]
+
+#define NOTI_POST_OBNAME(obserName,obserObject,dataInfo)    [[NSNotificationCenter defaultCenter] postNotificationName:obserName object:obserObject userInfo:dataInfo]
+
+#define NOTI_REMOVE_OBNAME(obserObject,obserName)       [[NSNotificationCenter defaultCenter] removeObserver:obserObject name:obserName object:nil]
+
+#define NOTI_REMOVE_SELF [[NSNotificationCenter defaultCenter] removeObserver:self]
+
+
+
+
+
+
+
+
+
+
+#endif /* PrefixHeader_pch */
