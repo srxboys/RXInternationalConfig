@@ -139,7 +139,11 @@ if([keyValueStr isEqualToString:@"Title_preference"]) {
             }];
         }
     }
+    else {
+        dispatch_semaphore_signal(sema);
+    }
 }
+
  
 /*
  版本号的判断

@@ -12,8 +12,11 @@
 - 设备【` 设置 `】- 可以配置可以 [告知]和[显示] app信息
 - ` 动态修改app icon `
 
+### 展示效果
+![srxboys_config](https://github.com/srxboys/RXInternationalConfig/blob/master/app_config.gif)
 
 
-如果你有想说的可以 [issues I](https://github.com/srxboys/RXExtenstion/issues/new) 。<br>
+
+如果你有想说的可以 [issues I](https://github.com/srxboys/RXInternationalConfig/issues/new) 。<br>
 如果你有更好的改进，please pull reqeust me <br>
 :sweat_smile::sweat_smile::sweat_smile::sweat_smile::sweat_smile:
